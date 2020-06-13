@@ -8,19 +8,18 @@
             }
         }
     },
-    "train_data_path": "/home1/chujiqun/similarity/train.txt",
-    "validation_data_path": "/home1/chujiqun/similarity/dev.txt",
+    "train_data_path": "/home/chujiqun/SNLI/train.txt",
+    "validation_data_path": "/home/chujiqun/SNLI/dev.txt",
     "evaluate_on_test": true,
     "model": {
         "type": "mv_lstm",
-        "dropout": 0.2,
+        "dropout": 0.0,
         "text_field_embedder": {
             "token_embedders": {
                 "tokens": {
                     "type": "embedding",
-                    "pretrained_file": "/home1/chujiqun/similarity/glove.840B.300d.zip",
                     "embedding_dim": 300,
-                    "trainable": false
+                    "trainable": true
                 }
             }
         },
@@ -42,9 +41,9 @@
         "output_feedforward": {
             "input_dim": 640,
             "num_layers": 2,
-            "hidden_dims": [320, 1],
+            "hidden_dims": [256, 1],
             "activations": ["relu", "linear"],
-            "dropout": [0.2,0.0]
+            "dropout": [0.0,0.0]
         }
     },
     "iterator": {
@@ -52,21 +51,5 @@
         "sorting_keys": [["Orgquestion", "num_tokens"],
                          ["Relquestion", "num_tokens"]],
         "batch_size": 32
-    },
-    "trainer": {
-        "num_epochs": 25,
-        "cuda_device": 0,
-        "validation_metric": "+Auc",
-        "learning_rate_scheduler": {
-            "type": "reduce_on_plateau",
-            "factor": 0.5,
-            "mode": "max",
-            "patience": 2,
-            "min_lr": 0.00001
-        },
-        "optimizer": {
-            "type": "rmsprop",
-            "lr": 0.0001,
-        }
     }
 }

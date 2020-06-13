@@ -20,8 +20,12 @@ from library.modules.matching_layer import MatchingLayer
 
 
 def cross_entropy(out, label):
-    tmp=torch.mul(torch.log(out.squeeze(1)),label.squeeze(1))+torch.mul(torch.log(1-out.squeeze(1)),1-label.squeeze(1))
-    return -1*torch.sum(tmp)
+    x1=out.squeeze(1)[out.squeeze(1)>1e-5]
+    y1=label.squeeze(1)[out.squeeze(1)>1e-5]
+    x2=1-out.squeeze(1)[out.squeeze(1)<1-1e-5]
+    y2=1-label.squeeze(1)[out.squeeze(1)<1-1e-5]
+    tmp=torch.sum(torch.mul(torch.log(x1),y1))+torch.sum(torch.mul(torch.log(x2),y2))
+    return -1*tmp
 
 @Model.register( "match_pyramid" )
 class MatchPyramid( Model ):
@@ -67,7 +71,7 @@ class MatchPyramid( Model ):
         pool_out = self._pool_layer( conv_out ) # dynamic pooling到固定维度
 
         label_logits = self._output_feedforward( pool_out )
-        label_logits=F.sigmoid(label_logits)
+        label_logits=torch.sigmoid(label_logits)
         output_dict = {"label_logits": label_logits}
 
         if label is not None:

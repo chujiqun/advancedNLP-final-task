@@ -10,13 +10,14 @@ warnings.filterwarnings("ignore")
 
 # 目前支持: [bimpm, cafe, decomposable_attention, esim, match_pyramid, mv_lstm, san]
 
-# model = "match_pyramid"
-model = "mv_lstm"
+model = "match_pyramid"
+# model = "mv_lstm"
 config_file = "config/%s.jsonnet" % model
+train_data_path="/home1/chujiqun/similarity/train.txt"
 
-overrides = json.dumps({"trainer": {"cuda_device": 1}})
+overrides = json.dumps({"train_data_path":train_data_path, "trainer": {"cuda_device": 1}})
 
-serialization_dir = "checkpoint/%s" % model
+serialization_dir = "checkpoint/%s_cos_hyper" % model
 
 shutil.rmtree(serialization_dir, ignore_errors=True)
 logger = logging.getLogger(__name__)

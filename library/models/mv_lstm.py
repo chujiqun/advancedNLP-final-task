@@ -18,8 +18,12 @@ from library.modules.neural_tensor_network import NeuralTensorNetwork
 from library.modules.k_max_pool import kMaxPool
 
 def cross_entropy(out, label):
-    tmp=torch.mul(torch.log(out.squeeze(1)),label.squeeze(1))+torch.mul(torch.log(1-out.squeeze(1)),1-label.squeeze(1))
-    return -1*torch.sum(tmp)
+    x1=out.squeeze(1)[out.squeeze(1)>1e-5]
+    y1=label.squeeze(1)[out.squeeze(1)>1e-5]
+    x2=1-out.squeeze(1)[out.squeeze(1)<1-1e-5]
+    y2=1-label.squeeze(1)[out.squeeze(1)<1-1e-5]
+    tmp=torch.sum(torch.mul(torch.log(x1),y1))+torch.sum(torch.mul(torch.log(x2),y2))
+    return -1*tmp
 
 @Model.register( "mv_lstm" )
 class MV_LSTM( Model ):
@@ -67,7 +71,7 @@ class MV_LSTM( Model ):
         similarity_matrix = self._matching_layer( encoded_premise, encoded_hypo )
         pool_out = self._pool_layer( similarity_matrix ) # k-max pooling到固定维度
         label_out = self._output_feedforward( pool_out )
-        label_logits=F.sigmoid(label_out)
+        label_logits=torch.sigmoid(label_out)
         output_dict = {"label_logits": label_logits}
 
         if label is not None:
